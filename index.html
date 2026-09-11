@@ -5402,15 +5402,23 @@ p.form-submit {
                 </div>
             </div>
         </label></div><div id="botao-personalizado-add">
-                <button class="btn-add-variacao" data-produto-id="3631">Adicionar no carrinho</button>
+                <button class="btn-add-variacao" data-produto-id="3631">Comprar agora</button>
             </div><script>
     document.addEventListener("DOMContentLoaded", function () {
         const cards = document.querySelectorAll(".variacao-card");
         const botaoContainer = document.getElementById("botao-personalizado-add");
 
+        // Cada variação vai para o checkout correspondente na Nxgate.
+        const checkoutUrls = {
+            "3630": "https://checkout.nxgate.com.br/89", // Leve 1 pote - R$147,00
+            "3631": "https://checkout.nxgate.com.br/90", // Leve 2 potes - R$199,00
+            "3632": "https://checkout.nxgate.com.br/91", // Leve 3 potes - R$259,00
+            "3633": "https://checkout.nxgate.com.br/92"  // Leve 5 potes - R$349,00
+        };
+
         function atualizarBotao(varId) {
             botaoContainer.innerHTML = `
-                <button class="btn-add-variacao" data-produto-id="${varId}">Adicionar no carrinho</button>
+                <button class="btn-add-variacao" data-produto-id="${varId}">Comprar agora</button>
             `;
         }
 
@@ -5433,20 +5441,13 @@ p.form-submit {
             if (e.target.classList.contains("btn-add-variacao")) {
                 e.preventDefault();
                 const varId = e.target.getAttribute("data-produto-id");
+                const checkoutUrl = checkoutUrls[varId];
 
-                fetch("/?add-to-cart=" + varId, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    }
-                }).then(() => {
-                    setTimeout(() => {
-                        const carrinhoCaddy = document.querySelector(".cc_cart_items_list");
-                        if (carrinhoCaddy) {
-                            carrinhoCaddy.click();
-                        }
-                    }, 300);
-                });
+                if (checkoutUrl) {
+                    window.location.href = checkoutUrl;
+                } else {
+                    console.error("Nenhum checkout configurado para a variação " + varId);
+                }
             }
         });
     });
